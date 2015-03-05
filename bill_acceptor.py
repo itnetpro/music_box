@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+import os
+import signal
+from time import sleep
+from datetime import datetime
+from utils import load_config
+
+ini = load_config()
+pin_in = int(ini.get('main', 'pin'))
+price = int(ini.get('main', 'price'))
+acceptor = ini.get('main', 'acceptor')
+debug = False
+
+"""
+if not debug:
+        import pifacedigitalio
+        pfd = pifacedigitalio.PiFaceDigital(init_board=False)
+"""
+
+if not debug:
+    import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    GPIO.setup(pin_in, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+
+def kill_handler(signum, frame):
+    if os.path.exists(pid_file):
+        os.unlink(pid_file)
+    exit()
+
+
+def get_bill():
+    bill = 0
+    while True:
+        gap = 0
+        #while pfd.input_pins[pin_in].value and gap < 7:
+        while not GPIO.input(pin_in) and gap < 7:
+            if bill:
+                gap += 1
+            sleep(.01)
+
+        if gap == 7:
+            return bill * 10
+        bill += 1
+
+        while GPIO.input(pin_in):
+        #while pfd.input_pins[pin_in].value:
+            sleep(.01)
+
+
+def get_bill_coin():
+    count = 0
+    dt = datetime.now()
+    while True:
+        if GPIO.input(pin_in):
+        #if pfd.input_pins[pin_in].value:
+            count += 1
+            if count > 1 and (datetime.now() - dt).total_seconds() > 1:
+                count = 0
+            dt = datetime.now()
+        if count == 4:
+            return price
+        sleep(0.0045)
+
+
+def get_bill_debug():
+    n = 0
+    while True:
+        if n > 5:
+            m = int(n)
+            n = 0
+            return m
+        sleep(1)
+        n += 1
+
+
+def main():
+    global pfd, pin_in, pid_file, debug
+
+    pid_file = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), 'bill.pid')
+
+    with open(pid_file, 'w') as pf:
+        pf.write(str(os.getpid()))
+
+    signal.signal(signal.SIGTERM, kill_handler)
+
+    if debug:
+        get_bill_func = get_bill_debug
+    elif acceptor == 'coin':
+        get_bill_func = get_bill_coin
+    else:
+        get_bill_func = get_bill
+
+    while True:
+        bill = get_bill_func()
+        if bill:
+            print(bill)
+            sys.stdout.flush()
+
+    return 0
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+
+  <title></title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+</head>
+<body>
+<div class="container">
+
+  <form class="form-signin" method="post">
+    <h2 class="form-signin-heading">Настройки</h2>
+    {% with messages =  get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for type, message in messages %}
+          {% if type == 'error' %}
+            <div class="alert alert-danger" role="alert">
+              {{ message }}
+            </div>
+          {% elif type == 'success' %}
+            <div class="alert alert-success" role="alert">
+              {{ message }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <label for="inputLogin"><h3>Логин</h3></label>
+    <input type="text" id="inputLogin" class="form-control" placeholder="Логин" required name="login" value="{{ login }}" readonly>
+    <label for="inputPassword"><h3>Пароль</h3></label>
+    <input type="text" id="inputPassword" class="form-control" placeholder="Логин" required name="passwd" value="{{ password }}">
+
+    <label for="inputNumber"><h3>Цена</h3></label>
+    <input type="number" id="inputNumber" class="form-control" placeholder="Цена" required autofocus name="price" value="{{ price }}">
+    <label for="inputPin"><h3>Пин</h3></label>
+    <input type="number" id="inputPin" class="form-control" placeholder="Пин" required name="pin" value="{{ pin }}">
+    <label for="inputAcceptor"><h3>Тип валютного аппарата</h3></label>
+    <select id="inputAcceptor" class="form-control" required name="acceptor">
+      <option value="biil"{% if acceptor == 'bill' %} selected {% endif %}>купюрприемник</option>
+      <option value="coin"{% if acceptor == 'coin' %} selected {% endif %}>жетоны</option>
+    </select>
+    <label for="inputApi"><h3>api</h3></label>
+    <select id="inputApi" class="form-control" required name="api">
+      <option value="pleer"{% if api == 'pleer' %} selected {% endif %}>pleer</option>
+      <option value="soundclound"{% if api == 'soundclound' %} selected {% endif %}>soundclound</option>
+    </select>
+    <label for="inputKey"><h3>Ключ</h3></label>
+    <input type="text" id="inputKey" class="form-control" placeholder="Ключ" required name="key" value="{{ key }}" readonly>
+    <label for="inputSecret"><h3>Секретный ключ</h3></label>
+    <input type="text" id="inputSecret" class="form-control" placeholder="Секретный ключ" required name="secret_key" value="{{ secret_key }}" readonly>
+    <br>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Сохранить</button>
+    <a href="{{ url_for('gen_keys') }}" class="btn btn-lg btn-block">Генерировать ключи</a>
+  </form>
+</div>
+</body>
+</html>

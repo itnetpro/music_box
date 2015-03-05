@@ -1,0 +1,14 @@
+#Flask==0.10.1
+Jinja2==2.7.3
+MarkupSafe==0.23
+Pillow==2.7.0
+PySide==1.2.2
+Werkzeug==0.10
+argparse==1.2.1
+fudge==1.0.3
+itsdangerous==0.24
+moc==0.2
+requests==2.5.1
+simplejson==3.6.5
+soundcloud==0.4.1
+wsgiref==0.1.2
